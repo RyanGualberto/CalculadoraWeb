@@ -1,7 +1,7 @@
 class CalcController {
 
     constructor() {
-        this._lastOperator = '+'; 
+        this._lastOperator = '+';
         this._lastNumber = '';
         this._operation = [];
         this._locale = 'pt-BR';
@@ -11,6 +11,7 @@ class CalcController {
         this._currentDate;
         this.initialize();
         this.initButtonsEvents();
+        this.initKeyboard();
 
     }
 
@@ -25,6 +26,57 @@ class CalcController {
         this.setLastNumberToDisplay();
     }
 
+    initKeyboard() {
+        document.addEventListener('keyup', e => {
+            console.log(e.key)
+
+            switch (e.key) {
+                case 'Escape':
+                    this.clearAll();
+                    break;
+    
+                case 'Backspace':
+                    this.clearEntry();
+                    break;
+    
+                case '+':
+                case '-':
+                case '*':
+                case '/':
+                case '%':
+                    this.addOperation(e.key);
+                    break;
+    
+                case 'Enter':
+                case '=':
+                    this.calc();
+                    break;
+    
+                case '.':
+                case ',':
+                    this.addDot();
+                    break;
+    
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    this.addOperation(parseInt(e.key));
+                    break;
+    
+    
+            }
+        });
+
+        
+    }
+
     addEventListenerAll(element, events, fn) {
 
         events.split(' ').forEach(event => {
@@ -37,7 +89,7 @@ class CalcController {
         this._lastNumber = '';
         this._lastOperator = '';
         this.setLastNumberToDisplay();
-        
+
     }
 
     clearEntry() {
@@ -65,7 +117,7 @@ class CalcController {
         }
     }
 
-    getResult(){
+    getResult() {
         return eval(this._operation.join(""));
     }
 
@@ -73,14 +125,14 @@ class CalcController {
         let last = '';
         this._lastOperator = this.getLastItem();
 
-        if(this._operation.length < 3){
+        if (this._operation.length < 3) {
             let firstItem = this._operation[0];
             this._operation = [firstItem, this._lastOperator, this._lastNumber];
         }
 
         if (this._operation.length > 3) {
             last = this._operation.pop();
-            this._lastNumber = this.getResult(); 
+            this._lastNumber = this.getResult();
         }
 
         else if (this._operation.length == 3) {
@@ -104,19 +156,19 @@ class CalcController {
 
     }
 
-    getLastItem(isOperator = true){
+    getLastItem(isOperator = true) {
         let LastItem;
         for (let i = this._operation.length - 1; i >= 0; i--) {
 
-                if (this.isOperator(this._operation[i]) == isOperator) {
-                    LastItem = this._operation[i];
-                    break;
-                }
-                
-                if(!LastItem){
-                    LastItem = (isOperator) ? this._lastOperator : this._lastNumber;
-                }
+            if (this.isOperator(this._operation[i]) == isOperator) {
+                LastItem = this._operation[i];
+                break;
             }
+
+            if (!LastItem) {
+                LastItem = (isOperator) ? this._lastOperator : this._lastNumber;
+            }
+        }
 
 
 
@@ -155,13 +207,13 @@ class CalcController {
         this.displayCalc = "Error";
     }
 
-    addDot(){
+    addDot() {
         let lastOperation = this.getLastOperation();
 
         if (typeof lastOperation === 'string' && lastOperation.split('').indexOf('.') > -1) return;
-        
 
-        if(this.isOperator(lastOperation) || !lastOperation) {
+
+        if (this.isOperator(lastOperation) || !lastOperation) {
             this.pushOperation('0.');
         } else {
             this.setLastOperation(lastOperation.toString() + '.');
